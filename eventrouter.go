@@ -23,7 +23,7 @@ import (
 	"github.com/openshift/eventrouter/sinks"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	coreinformers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -52,11 +52,33 @@ var (
 		"reason",
 		"source",
 	})
+	kubernetesInfoEventCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "heptio_eventrouter_info_total",
+		Help: "Total number of info events in the kubernetes cluster",
+	}, []string{
+		"involved_object_kind",
+		"involved_object_name",
+		"involved_object_namespace",
+		"reason",
+		"source",
+	})
+	kubernetesUnknownEventCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "heptio_eventrouter_unknown_total",
+		Help: "Total number of events of unknown type in the kubernetes cluster",
+	}, []string{
+		"involved_object_kind",
+		"involved_object_name",
+		"involved_object_namespace",
+		"reason",
+		"source",
+	})
 )
 
 func init() {
 	prometheus.MustRegister(kubernetesWarningEventCounterVec)
 	prometheus.MustRegister(kubernetesNormalEventCounterVec)
+	prometheus.MustRegister(kubernetesInfoEventCounterVec)
+	prometheus.MustRegister(kubernetesUnknownEventCounterVec)
 }
 
 // EventRouter is responsible for maintaining a stream of kubernetes
@@ -127,7 +149,8 @@ func prometheusEvent(event *v1.Event) {
 	var counter prometheus.Counter
 	var err error
 
-	if event.Type == "Normal" {
+	switch event.Type {
+	case "Normal":
 		counter, err = kubernetesNormalEventCounterVec.GetMetricWithLabelValues(
 			event.InvolvedObject.Kind,
 			event.InvolvedObject.Name,
@@ -135,8 +158,24 @@ func prometheusEvent(event *v1.Event) {
 			event.Reason,
 			event.Source.Host,
 		)
-	} else if event.Type == "Warning" {
+	case "Warning":
 		counter, err = kubernetesWarningEventCounterVec.GetMetricWithLabelValues(
+			event.InvolvedObject.Kind,
+			event.InvolvedObject.Name,
+			event.InvolvedObject.Namespace,
+			event.Reason,
+			event.Source.Host,
+		)
+	case "Info":
+		counter, err = kubernetesInfoEventCounterVec.GetMetricWithLabelValues(
+			event.InvolvedObject.Kind,
+			event.InvolvedObject.Name,
+			event.InvolvedObject.Namespace,
+			event.Reason,
+			event.Source.Host,
+		)
+	default:
+		counter, err = kubernetesUnknownEventCounterVec.GetMetricWithLabelValues(
 			event.InvolvedObject.Kind,
 			event.InvolvedObject.Name,
 			event.InvolvedObject.Namespace,
