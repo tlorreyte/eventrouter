@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/heptio/eventrouter/sinks"
+	"github.com/heptiolabs/eventrouter/sinks"
 	"github.com/kelseyhightower/envconfig"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,6 +33,10 @@ type KafkaEnv struct {
 	Topic    string   `required:"true"`
 	Async    bool     `default:true`
 	RetryMax int      `default:5`
+	SaslUser string   "kafkaSaslUser"
+	SaslPwd  string   "kafkaSaslPwd"
+
+
 }
 
 func main() {
@@ -42,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	kSink, err := sinks.NewKafkaSink(k.Brokers, k.Topic, k.Async, k.RetryMax)
+	kSink, err := sinks.NewKafkaSink(k.Brokers, k.Topic, k.Async, k.RetryMax, k.SaslUser, k.SaslPwd)
 	if err != nil {
 		log.Fatal(err)
 	}
