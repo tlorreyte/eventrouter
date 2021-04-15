@@ -4,5 +4,5 @@ COPY . .
 RUN go build .
 
 FROM registry.ci.openshift.org/ocp/4.6:base
-COPY --from=build /go/src/github.com/openshift/eventrouter/eventrouter /bin/eventrouter
+COPY --from=builder /go/src/github.com/openshift/eventrouter/eventrouter /bin/eventrouter
 CMD ["/bin/eventrouter", "-v", "3", "-logtostderr"]
