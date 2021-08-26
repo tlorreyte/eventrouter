@@ -6,3 +6,4 @@ RUN go build .
 FROM registry.ci.openshift.org/ocp/4.6:base
 COPY --from=builder /go/src/github.com/openshift/eventrouter/eventrouter /bin/eventrouter
 CMD ["/bin/eventrouter", "-v", "3", "-logtostderr"]
+LABEL version=v0.3
