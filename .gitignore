@@ -60,4 +60,4 @@ tags
 !.vscode/extensions.json
 .history
 
-eventrouter
+/eventrouter
