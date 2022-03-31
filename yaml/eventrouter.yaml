@@ -44,7 +44,7 @@ apiVersion: v1
 data:
   config.json: |- 
     {
-      "sink": "glog"
+      "sink": "stdout"
     }
 kind: ConfigMap
 metadata:
@@ -71,7 +71,11 @@ spec:
     spec:
       containers:
         - name: kube-eventrouter
-          image: gcr.io/heptio-images/eventrouter:latest
+          image: registry.redhat.io/openshift-logging/eventrouter-rhel8:v0.3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: config-volume
