@@ -72,6 +72,8 @@ spec:
       containers:
         - name: kube-eventrouter
           image: registry.redhat.io/openshift-logging/eventrouter-rhel8:v0.3
+          imagePullSecrets:
+          - name: registry.redhat.io
           resources:
             requests:
               cpu: 100m
