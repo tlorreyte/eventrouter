@@ -25,16 +25,16 @@ TEST_PKGS ?= $(GOTARGET)/sinks/...
 TEST = go test $(TEST_PKGS) $(TESTARGS)
 
 build: fmt
-	go build -o $(TARGET)
+	go build -mod=mod -o $(TARGET)
 .PHONY: build
 
 fmt:
 	@echo gofmt
 
 image:
-	podman build -f Dockerfile.rhel8 -t $(LOCAL_IMAGE_TAG) .
+	podman build  -f Dockerfile.rhel8 -t $(LOCAL_IMAGE_TAG) .
 .PHONY: image
 
 test:
-	go test $(TEST_PKGS) $(TESTARGS)
+	go test -mod=mod $(TEST_PKGS) $(TESTARGS)
 .PHONY: test
