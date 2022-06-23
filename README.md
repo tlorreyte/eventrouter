@@ -32,6 +32,12 @@ Teardown:
 $ kubectl delete -f https://raw.githubusercontent.com/openshift/eventrouter/master/yaml/eventrouter.yaml
 ```
 
+Using helm 3
+
+```
+helm --namespace kube-system install eventrouter .
+```
+
 ### Inspecting the output 
 ```
 $ kubectl logs -f deployment/eventrouter -n kube-system 
