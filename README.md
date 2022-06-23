@@ -22,14 +22,21 @@ By default, eventrouter is configured to leverage existing EFK stacks by outputt
 _sink_
 * This service does not serve as a storage layer, that is also the responsibility of the _sink_
 
+## Building
+
+```
+make build
+make image
+```
+
 ## Running Eventrouter 
 Standup: 
 ```
-$ kubectl create -f https://raw.githubusercontent.com/openshift/eventrouter/master/yaml/eventrouter.yaml
+$ kubectl create -f https://raw.githubusercontent.com/zwindler/eventrouter/master/yaml/eventrouter.yaml
 ```
 Teardown: 
 ```
-$ kubectl delete -f https://raw.githubusercontent.com/openshift/eventrouter/master/yaml/eventrouter.yaml
+$ kubectl delete -f https://raw.githubusercontent.com/zwindler/eventrouter/master/yaml/eventrouter.yaml
 ```
 
 Using helm 3
