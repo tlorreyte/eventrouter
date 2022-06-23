@@ -14,7 +14,8 @@
 
 TARGET = eventrouter
 GOTARGET = github.com/openshift/$(TARGET)
-IMAGE_REPOSITORY_NAME ?= quay.io/openshift/logging-eventrouter:latest
+LOCAL_IMAGE_TAG=zwindler/logging-eventrouter:0.4.0
+IMAGE_REPOSITORY_NAME=zwindler/logging-eventrouter:0.4.0
 
 ifneq ($(VERBOSE),)
 VERBOSE_FLAG = -v
@@ -32,12 +33,8 @@ fmt:
 	@echo gofmt
 
 image:
-	podman build --platform=$(TARGET_PLATFORMS) --manifest eventrouter -f Dockerfile
-	podman tag localhost/eventrouter $(IMAGE_REPOSITORY_NAME)
-
-image-push: image
-	podman manifest push --all $(IMAGE_REPOSITORY_NAME) docker://$(IMAGE_REPOSITORY_NAME)
-
+	docker build  -f Dockerfile -t $(LOCAL_IMAGE_TAG) .
+	docker tag $(LOCAL_IMAGE_TAG) $(IMAGE_REPOSITORY_NAME)
 .PHONY: image
 
 test:
