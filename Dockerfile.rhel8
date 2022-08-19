@@ -1,10 +1,10 @@
-FROM registry.redhat.io/ubi8/go-toolset:1.16.12 AS  builder
+FROM registry.redhat.io/ubi8/go-toolset AS  builder
 WORKDIR  /go/src/github.com/openshift/eventrouter
 USER 0
 COPY . .
 RUN go build .
 
-FROM registry.redhat.io/ubi8:8.5
+FROM registry.redhat.io/ubi8:8.6
 COPY --from=builder /go/src/github.com/openshift/eventrouter/eventrouter /bin/eventrouter
 CMD ["/bin/eventrouter", "-v", "3", "-logtostderr"]
 LABEL version=v0.4.0
