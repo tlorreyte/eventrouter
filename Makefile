@@ -14,7 +14,7 @@
 
 TARGET = eventrouter
 GOTARGET = github.com/openshift/$(TARGET)
-IMAGE_REPOSITORY_NAME ?= quay.io/openshift/logging-eventrouter:latest
+IMAGE_REPOSITORY_NAME ?= quay.io/openshift/openshift-logging:latest
 
 ifneq ($(VERBOSE),)
 VERBOSE_FLAG = -v
