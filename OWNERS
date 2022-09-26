@@ -10,6 +10,7 @@ filters:
       - vimalk78
       - syedriko
       - cahartma
+      - vparfonov
   "Dockerfile(?:\\.in)?$":   # matches Dockerfile, Dockerfile.in
     labels:
       - midstream/Dockerfile
