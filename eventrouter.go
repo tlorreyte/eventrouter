@@ -154,6 +154,10 @@ func (er *EventRouter) updateEvent(objOld interface{}, objNew interface{}) {
 		glog.Error("Given object '%v' not v1.Event", objNew)
 		return
 	}
+	if eOld.ResourceVersion == eNew.ResourceVersion {
+		// change nothing so we can skip it
+		return
+	}
 	prometheusEvent(eNew)
 	er.eSink.UpdateEvents(eNew, eOld)
 }
