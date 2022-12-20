@@ -79,6 +79,7 @@ func loadConfig() kubernetes.Interface {
 	}
 
 	viper.BindEnv("kubeconfig") // Allows the KUBECONFIG env var to override where the kubeconfig is
+	viper.BindEnv("WATCH_NAMESPACE")
 
 	// Allow specifying a custom config file via the EVENTROUTER_CONFIG env var
 	if forceCfg := os.Getenv("EVENTROUTER_CONFIG"); forceCfg != "" {
@@ -105,9 +106,8 @@ func loadConfig() kubernetes.Interface {
 // main entry point of the program
 func main() {
 	var wg sync.WaitGroup
-
 	clientset := loadConfig()
-	sharedInformers := informers.NewSharedInformerFactory(clientset, viper.GetDuration("resync-interval"))
+	sharedInformers := informers.NewSharedInformerFactoryWithOptions(clientset, viper.GetDuration("resync-interval"), informers.WithNamespace(viper.GetString("WATCH_NAMESPACE")))
 	eventsInformer := sharedInformers.Core().V1().Events()
 
 	// TODO: Support locking for HA https://github.com/kubernetes/kubernetes/pull/42666
