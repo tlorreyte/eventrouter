@@ -7,7 +7,6 @@ require (
 	github.com/crewjam/rfc5424 v0.0.0-20180723152949-c25bdd3a0ba2
 	github.com/eapache/channels v1.1.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/heptiolabs/eventrouter v0.0.0-20191206192100-eec922928a3f
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
