@@ -1,6 +1,6 @@
 module github.com/openshift/eventrouter
 
-go 1.18
+go 1.19
 
 require (
 	github.com/Shopify/sarama v1.23.1

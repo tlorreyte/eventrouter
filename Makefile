@@ -25,15 +25,15 @@ TEST = go test $(TEST_PKGS) $(TESTARGS)
 TARGET_PLATFORMS := linux/amd64,linux/arm64
 
 build: fmt
-	go build -mod=mod -o $(TARGET)
+	CGO_ENABLED=$${CGO_ENABLED:-0} GOOS=$${TARGETOS:-} GOARCH=$${TARGETARCH:-} go build -mod=mod -o $(TARGET)
 .PHONY: build
 
 fmt:
 	@echo gofmt
 
 image:
-	buildah build --platform=$(TARGET_PLATFORMS) --manifest eventrouter -f Dockerfile.rhel8
-	buildah tag localhost/eventrouter $(IMAGE_REPOSITORY_NAME)
+	podman build --platform=$(TARGET_PLATFORMS) --manifest eventrouter -f Dockerfile
+	podman tag localhost/eventrouter $(IMAGE_REPOSITORY_NAME)
 
 image-push: image
 	podman manifest push --all $(IMAGE_REPOSITORY_NAME) docker://$(IMAGE_REPOSITORY_NAME)
