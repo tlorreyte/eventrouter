@@ -14,8 +14,8 @@
 
 TARGET = eventrouter
 GOTARGET = github.com/openshift/$(TARGET)
-LOCAL_IMAGE_TAG=zwindler/logging-eventrouter:0.4.0
-IMAGE_REPOSITORY_NAME=zwindler/logging-eventrouter:0.4.0
+LOCAL_IMAGE_TAG=zwindler/logging-eventrouter:0.5.0
+IMAGE_REPOSITORY_NAME=zwindler/logging-eventrouter:0.5.0
 
 ifneq ($(VERBOSE),)
 VERBOSE_FLAG = -v
