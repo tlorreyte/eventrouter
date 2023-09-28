@@ -3,5 +3,6 @@
 "sink": "glog",
 "httpSinkUrl": "http://localhost:8080",
 "httpSinkBufferSize": 1500,
-"httpSinkDiscardMessages": true
+"httpSinkDiscardMessages": true,
+"enable-http-pprof": false
 }

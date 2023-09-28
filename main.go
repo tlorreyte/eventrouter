@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"os/signal"
 	"sync"
@@ -73,11 +74,14 @@ func loadConfig() kubernetes.Interface {
 	viper.SetDefault("kubeconfig", "")
 	viper.SetDefault("sink", "glog")
 	viper.SetDefault("resync-interval", time.Minute*30)
+	viper.SetDefault("enable-prometheus", true)
+	viper.SetDefault("enable-http-pprof", false)
 	if err = viper.ReadInConfig(); err != nil {
 		panic(err.Error())
 	}
 
 	viper.BindEnv("kubeconfig") // Allows the KUBECONFIG env var to override where the kubeconfig is
+	viper.BindEnv("WATCH_NAMESPACE")
 
 	// Allow specifying a custom config file via the EVENTROUTER_CONFIG env var
 	if forceCfg := os.Getenv("EVENTROUTER_CONFIG"); forceCfg != "" {
@@ -104,21 +108,40 @@ func loadConfig() kubernetes.Interface {
 // main entry point of the program
 func main() {
 	var wg sync.WaitGroup
-
 	clientset := loadConfig()
-	sharedInformers := informers.NewSharedInformerFactory(clientset, viper.GetDuration("resync-interval"))
+	sharedInformers := informers.NewSharedInformerFactoryWithOptions(clientset, viper.GetDuration("resync-interval"), informers.WithNamespace(viper.GetString("WATCH_NAMESPACE")))
 	eventsInformer := sharedInformers.Core().V1().Events()
 
 	// TODO: Support locking for HA https://github.com/kubernetes/kubernetes/pull/42666
 	eventRouter := NewEventRouter(clientset, eventsInformer)
 	stop := sigHandler()
 
-	// Startup the http listener for Prometheus Metrics endpoint.
-	go func() {
+	mux := http.NewServeMux()
+
+	// Add handler for /debug/pprof
+	if viper.GetBool("enable-http-pprof") {
+		glog.Info("Starting http/pprof handler.")
+
+		// copied from net/http/pprof init()
+		mux.HandleFunc("/debug/pprof/", pprof.Index)
+		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	}
+
+	// Add handler for /metrics
+	if viper.GetBool("enable-prometheus") {
 		glog.Info("Starting prometheus metrics.")
-		http.Handle("/metrics", promhttp.Handler())
-		glog.Warning(http.ListenAndServe(*addr, nil))
-	}()
+		mux.Handle("/metrics", promhttp.Handler())
+	}
+
+	// Start the http listener for Prometheus Metrics or pprof debugging
+	if viper.GetBool("enable-http-pprof") || viper.GetBool("enable-prometheus") {
+		go func() {
+			glog.Warning(http.ListenAndServe(*addr, mux))
+		}()
+	}
 
 	// Startup the EventRouter
 	wg.Add(1)

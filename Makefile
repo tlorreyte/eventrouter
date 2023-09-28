@@ -23,9 +23,10 @@ endif
 TESTARGS ?= $(VERBOSE_FLAG) -timeout 60s
 TEST_PKGS ?= $(GOTARGET)/sinks/...
 TEST = go test $(TEST_PKGS) $(TESTARGS)
+TARGET_PLATFORMS := linux/amd64,linux/arm64
 
 build: fmt
-	go build -mod=mod -o $(TARGET)
+	CGO_ENABLED=$${CGO_ENABLED:-0} GOOS=$${TARGETOS:-} GOARCH=$${TARGETARCH:-} go build -mod=mod -o $(TARGET)
 .PHONY: build
 
 fmt:
